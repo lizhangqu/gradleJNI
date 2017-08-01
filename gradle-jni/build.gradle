@@ -1,0 +1,112 @@
+apply plugin: 'cpp'
+apply plugin: 'application'
+sourceCompatibility = 1.8
+//入口
+mainClassName = "io.github.lizhangqu.Main"
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+}
+
+def JAVA_HOME = System.getenv("JAVA_HOME")
+def jniLibName = "bridge"
+model {
+    components {
+        "${jniLibName}"(NativeLibrarySpec) {
+//        NativeExecutableSpec for exe
+//        NativeLibrarySpec for lib
+            sources {
+                cpp {
+                    source {
+                        srcDir 'src/main/jni'
+                    }
+                }
+            }
+        }
+    }
+    toolChains {
+        visualCpp(VisualCpp) {
+            eachPlatform {
+                cppCompiler.withArguments { args ->
+
+                }
+            }
+        }
+        gcc(Gcc) {
+            eachPlatform {
+                if (System.properties['os.name'].equals("Mac OS X")) {
+                    cppCompiler.withArguments { args ->
+                        args << "-I" + JAVA_HOME + "/include"
+                        args << "-I" + JAVA_HOME + "/include/darwin"
+                        args << "-O2"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                } else {
+                    cppCompiler.withArguments { args ->
+                        args << "-I" + JAVA_HOME + "/include"
+                        args << "-I" + JAVA_HOME + "/include/linux"
+                        args << "-O2"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                }
+            }
+        }
+        clang(Clang) {
+            eachPlatform {
+                if (System.properties['os.name'].equals("Mac OS X")) {
+                    cppCompiler.withArguments { args ->
+                        args << "-I" + JAVA_HOME + "/include"
+                        args << "-I" + JAVA_HOME + "/include/darwin"
+                        args << "-O2"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                } else {
+                    cppCompiler.withArguments { args ->
+                        args << "-I" + JAVA_HOME + "/include"
+                        args << "-I" + JAVA_HOME + "/include/linux"
+                        args << "-O2"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+run {
+    //加入so的目录
+    systemProperty 'java.library.path', file("${buildDir}/libs/${jniLibName}/shared")
+}
+
+project.afterEvaluate {
+    def compileJavaTask = project.tasks.findByName("compileJava")
+
+    tasks.all { Task task ->
+        if (task.name.equalsIgnoreCase("${jniLibName}SharedLibrary")) {
+            compileJavaTask.dependsOn task
+        }
+        if (task.name.equalsIgnoreCase("${jniLibName}StaticLibrary")) {
+            compileJavaTask.dependsOn task
+        }
+    }
+}
