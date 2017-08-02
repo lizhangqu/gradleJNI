@@ -16,8 +16,8 @@ def jniLibName = "bridge"
 model {
     components {
         "${jniLibName}"(NativeLibrarySpec) {
-//        NativeExecutableSpec for exe
-//        NativeLibrarySpec for lib
+//        NativeExecutableSpec for executable
+//        NativeLibrarySpec for library
             sources {
                 cpp {
                     source {
