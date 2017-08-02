@@ -1,7 +1,8 @@
 apply plugin: 'cpp'
 apply plugin: 'application'
+apply plugin: 'java'
 sourceCompatibility = 1.8
-//入口
+//entry
 mainClassName = "io.github.lizhangqu.Main"
 repositories {
     mavenCentral()
@@ -94,8 +95,39 @@ model {
 
 
 run {
-    //加入so的目录
+    //add shared library to java.library.path when run gradle run
     systemProperty 'java.library.path', file("${buildDir}/libs/${jniLibName}/shared")
+}
+
+static def currentOS() {
+    final String p = System.getProperty("os.name").toLowerCase();
+    if (p.contains("linux")) {
+        return "linux"
+    } else if (p.contains("os x") || p.contains("darwin")) {
+        return "darwin"
+    } else if (p.contains("windows")) {
+        return "windows"
+    } else {
+        return p.replaceAll("\\s", "")
+    }
+}
+
+static def currentArchitecture() {
+    final String arch = System.getProperty("os.arch").toLowerCase()
+    return (arch.equals("amd64")) ? "x86_64" : arch
+}
+
+
+jar {
+    //entry
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    //copy shared library to classpath when assemble a jar
+    from(file("${buildDir}/libs/${jniLibName}/shared")) {
+        into "io/github/lizhangqu/${currentOS()}-${currentArchitecture()}"
+    }
+
 }
 
 project.afterEvaluate {
