@@ -9,8 +9,8 @@ import java.io.InputStream;
 
 final class NativeLibrary {
     private static final boolean DEBUG = true;
-    private static final String PACKAGENAME = "org/tensorflow/native/";
-    private static final String LIBNAME = "tensorflow_jni";
+    private static final String PACKAGENAME = "io/github/lizhangqu/";
+    private static final String LIBNAME = "bridge";
 
     public static void load() {
         if (isLoaded() || tryLoadLibrary()) {
@@ -18,8 +18,7 @@ final class NativeLibrary {
             // (1) The native library has already been statically loaded, OR
             // (2) The required native code has been statically linked (through a custom launcher), OR
             // (3) The native code is part of another library (such as an an application-level libraryh)
-            // that has already been loaded. For example, tensorflow/examples/android and
-            // tensorflow/contrib/android include the required native code in differently named libraries.
+            // that has already been loaded.
             //
             // Doesn't matter how, but it seems the native code is loaded, so nothing else to do.
             return;
@@ -32,9 +31,7 @@ final class NativeLibrary {
         if (resource == null) {
             throw new UnsatisfiedLinkError(
                     String.format(
-                            "Cannot find TensorFlow native library for OS: %s, architecture: %s. "
-                                    + "See https://github.com/tensorflow/tensorflow/tree/master/java/README.md "
-                                    + "for possible solutions (such as building the library from source).",
+                            "Cannot find bridge native library for OS: %s, architecture: %s. ",
                             os(), architecture()));
         }
         try {
@@ -101,7 +98,7 @@ final class NativeLibrary {
 
     private static void log(String msg) {
         if (DEBUG) {
-            System.err.println("org.tensorflow.NativeLibrary: " + msg);
+            System.err.println("io.github.lizhangqu.NativeLibrary: " + msg);
         }
     }
 

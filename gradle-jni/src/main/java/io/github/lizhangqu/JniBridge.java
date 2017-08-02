@@ -3,7 +3,7 @@ package io.github.lizhangqu;
 public class JniBridge {
 
     static {
-        System.loadLibrary("bridge");
+        NativeLibrary.load();
     }
 
     public static native int version();
